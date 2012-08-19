@@ -7,7 +7,10 @@ Plugin.create(:md5tweet) do
       :name => "md5でつぶやく",
       :condition => lambda{|postbox| postbox.post.editable? },
       :exec => lambda{|postbox| 
-        postbox.widget_post.buffer.text = Digest::MD5.hexdigest(postbox.widget_post.buffer.text)
+        org_text = postbox.widget_post.buffer.text
+        reply, body = org_text.match(/^\s*(@[a-zA-Z0-9_]+)?\s*(.*)$/).captures
+        hash = Digest::MD5.hexdigest(body)
+        postbox.widget_post.buffer.text = "#{reply} #{hash}"
         postbox.post_it },
       :visible => true,
       :role => :postbox
